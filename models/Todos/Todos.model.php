@@ -40,6 +40,8 @@ class Todos
         return false;
     }
 
+
+
     public static function allTodos()
     {
         global $db;
@@ -51,6 +53,38 @@ class Todos
             );
         }
         return [];
+    }
+
+    // update data 
+    public function update($id)
+    {
+        global $db;
+        $stmt = $db->prepare("UPDATE todos SET title=?, description=?, priority=?, status=?, due_time=? WHERE id=?");
+        $stmt->bind_param(
+            "sssssi",
+            $this->title,
+            $this->description,
+            $this->priority,
+            $this->status,
+            $this->due_time,
+            $id
+        );
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    // delete data 
+    public function delete($id)
+    {
+        global $db;
+        $stmt = $db->prepare("DELETE FROM todos WHERE id=?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
     }
 
     public static function findTodo($id)

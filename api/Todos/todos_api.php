@@ -44,6 +44,47 @@ class TodosApi
         ]);
     }
 
+    public function update()
+    {
+        $id = intval($_GET['id'] ?? 0);
+        $data = Todos::findTodo($id);
+        if (!$data) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Data not found"
+            ]);
+            return;
+        }
+        // all form input data 
+        $data = json_decode(file_get_contents("php://input"), true);
+        $error = $this->validate($data);
+        if ($error) {
+            echo json_encode([
+                "success" => false,
+                "message" => $error
+            ]);
+            return;
+        }
+        $todos = new Todos();
+        $todos->title = trim($data['title']);
+        $todos->description = trim($data['description']);
+        $todos->priority = trim($data['priority']);
+        $todos->status = trim($data['status']);
+        $todos->due_time = trim($data['due_time']);
+        $success = $todos->update(trim($id));
+        if ($success) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Task updated successfully",
+            ]);
+            return;
+        }
+        echo json_encode([
+            "success" => false,
+            "message" => "Failed to update task"
+        ]);
+    }
+
     public function find()
     {
         $id = intval($_GET['id'] ?? 0);
@@ -63,6 +104,32 @@ class TodosApi
                 ]
             );
         }
+    }
+
+    public function delete()
+    {
+        $id = intval($_GET['id'] ?? 0);
+        $data = Todos::findTodo($id);
+        if (!$data) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Data not found"
+            ]);
+            return;
+        }
+        $todos = new Todos();
+        $success = $todos->delete($id);
+        if ($success) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Task deleted successfully!"
+            ]);
+            return;
+        }
+        echo json_encode([
+            "success" => false,
+            "message" => "Failed to delete task!"
+        ]);
     }
 
     private function validate($data)
