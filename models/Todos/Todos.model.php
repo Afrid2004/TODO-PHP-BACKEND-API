@@ -99,4 +99,36 @@ class Todos
         $stmt->execute();
         return $stmt->get_result()->fetch_object();
     }
+
+
+    public static function dashboardData()
+    {
+        global $db;
+        //summary
+        $sql = "SELECT COUNT(*) as total,
+        SUM(status = 'pending') as pending,
+        SUM(status = 'in_progress') AS in_progress,
+            SUM(status = 'completed') AS completed
+        FROM todos";
+        $summaryResult = $db->query($sql);
+        $summary = $summaryResult->fetch_assoc();
+
+        // Recent Tasks
+        $recentSql = "SELECT * FROM todos ORDER BY created_at DESC LIMIT 5";
+        $recentResult = $db->query($recentSql);
+        $recentTasks = [];
+        if ($recentResult && $recentResult->num_rows > 0) {
+            $recentTasks = $recentResult->fetch_all(MYSQLI_ASSOC);
+        }
+
+        return [
+            "summary" => [
+                "total"       => (int) $summary['total'],
+                "pending"     => (int) $summary['pending'],
+                "in_progress" => (int) $summary['in_progress'],
+                "completed"   => (int) $summary['completed'],
+            ],
+            "recent_tasks" => $recentTasks
+        ];
+    }
 }

@@ -132,6 +132,15 @@ class TodosApi
         ]);
     }
 
+    public function dashboard()
+    {
+        $data = Todos::dashboardData();
+        echo json_encode([
+            "success" => true,
+            "data"    => $data
+        ]);
+    }
+
     private function validate($data)
     {
         $title = trim($data['title'] ?? '');
